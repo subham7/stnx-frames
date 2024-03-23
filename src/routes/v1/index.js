@@ -1,5 +1,5 @@
 const express = require('express');
-const healthRoute = require('./health.route');
+const healthRoute = require('./deposit.route');
 
 const router = express.Router();
 

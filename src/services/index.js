@@ -1,1 +1,1 @@
-module.exports.healthService = require('./health.service');
+module.exports.healthService = require('./deposit.service');
