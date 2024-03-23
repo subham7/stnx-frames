@@ -37,7 +37,12 @@ const approvedTransactionFrame = catchAsync(async (req, res) => {
 });
 
 const depositTransaction = catchAsync(async (req, res) => {
-  const data = await depositService.depositTransaction(req.body, req.query.networkId, req.query.depositAmt);
+  const data = await depositService.depositTransaction(
+    req.body,
+    req.query.networkId,
+    req.query.depositAmt,
+    req.query.daoAddress
+  );
   res.status(httpStatus.OK).send(data);
 });
 

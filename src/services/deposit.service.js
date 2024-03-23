@@ -85,15 +85,15 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
 };
 
 const aproveTransaction = async (data, networkId, depositAmt) => {
-  return approveToken(data, networkId);
+  return approveToken(data, depositAmt, networkId);
 };
 
 const approvedTransactionFrame = async (daoAddress, networkId, depositAmt) => {
   return FRAME_STATE.DEPOSIT_TXN_FRAME(daoAddress, networkId, depositAmt);
 };
 
-const depositTransaction = async (data, networkId, depositAmt) => {
-  return erc20Deposit(data, networkId);
+const depositTransaction = async (data, networkId, depositAmt, daoAddress) => {
+  return erc20Deposit(data, daoAddress, depositAmt, networkId);
 };
 
 const successTransactionFrame = async () => {
