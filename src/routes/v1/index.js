@@ -1,12 +1,12 @@
 const express = require('express');
-const healthRoute = require('./health.route');
+const depositRoute = require('./deposit.route');
 
 const router = express.Router();
 
 const defaultRoutes = [
   {
-    path: '/health',
-    route: healthRoute,
+    path: '/deposit',
+    route: depositRoute,
   },
 ];
 
