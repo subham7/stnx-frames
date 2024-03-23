@@ -88,3 +88,5 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
 
   return pngBuffer;
 };
+
+module.exports = { getDepositFrameImage };
