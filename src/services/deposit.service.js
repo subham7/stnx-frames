@@ -24,9 +24,22 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
   let totalAmountRaised = new BigNumber(stationDetail.totalAmountRaised)
     .dividedBy(new BigNumber(10).pow(decimals))
     .toNumber();
+  let raiseAmount = new BigNumber(stationDetail.raiseAmount).dividedBy(new BigNumber(10).pow(decimals)).toNumber();
+  let ownerAddress = stationDetail.ownerAddress;
+  let membersCount = stationDetail.membersCount;
 
   const { html } = await import('satori-html');
-  const template = html(TEMPLATES.DEFAULT(stationName, minDepositAmount, maxDepositAmount, totalAmountRaised));
+  const template = html(
+    TEMPLATES.DEFAULT(
+      stationName,
+      minDepositAmount,
+      maxDepositAmount,
+      totalAmountRaised,
+      raiseAmount,
+      ownerAddress,
+      membersCount
+    )
+  );
 
   const svg = await satori(template, {
     width: 600,

@@ -1,80 +1,69 @@
-const DEFAULT = (name, minDepositAmount, maxDepositAmount, totalAmountRaised) => `<div
-    style="
-    display: flex;
-    flex-direction:column;
-    justify-content: center;
-    width: 600px;
-    height: 400px;
-    color: #000;
-  "
-  >
-    <div
-      style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 6px;
-      padding: 12px;
-      border-radius: 4px;
-      background: grey;
-      color: #fff;
-      font-size: 30px;
-      font-weight:350;
-    "
-    >
-      ${name}
-    </div>
-
-    <div
-      style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction:column;
-      font-size:22px;
-      "
-    >
-      <div>Min deposit : ${minDepositAmount} USDC</div>
-
-      <div>Max deposit : ${maxDepositAmount} USDC</div>
-
-      <div>Total raised : ${totalAmountRaised} USDC</div>
-    </div>
-  </div> `;
-
-const TEST = (name, minDepositAmount, maxDepositAmount, totalAmountRaised) => `<div
+const DEFAULT = (name, minDepositAmount, maxDepositAmount, totalAmountRaised, raiseAmount, ownerAddress, membersCount) => `
+<div
   style="
     display: flex;
-    padding:50px;
+    padding: 100px 50px;
     flex-direction: column;
-    justify-content: center;
-    background: black;
+    justify-content: space-around;
+    background-image: linear-gradient(135deg,#292532,#111111);
     width: 600px;
     height: 400px;
     color: #fff;
   "
 >
-  <div style="margin: 6px; padding: 12px; color: #fff; font-size: 30px; font-weight: 350">${name}</div>
 
-  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 22px">
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; font-size: 22px">
-      <div>Min.</div>
-      <div>${minDepositAmount} USDC</div>
+  <div style="display: flex;align-items:center">
+    <span
+      style="min-height: 50px; min-width: 50px; border-radius: 10px; background-image: linear-gradient(135deg, #2e55ff, #ff279c); margin-right:15px;"
+    ></span>
+    <div style="color: #fff; font-size: 30px; font-weight: 500">${name}</div>
+  </div>
+
+  <div style="display: flex; justify-content: space-between">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        font-size: 22px;
+        font-weight: 500;
+      "
+    >
+      <div style="display: flex; flex-direction: column; font-size: 22px;margin-bottom:20px;">
+        <div style="color: #7a7d89">Min / Max</div>
+        <div>${minDepositAmount} / ${maxDepositAmount} USDC</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; font-size: 22px">
+        <div style="color: #7a7d89">Raised</div>
+        <div>${totalAmountRaised} / ${raiseAmount} USDC</div>
+      </div>
     </div>
 
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; font-size: 22px">
-      <div>Max.</div>
-      <div>${maxDepositAmount} USDC</div>
-    </div>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        font-size: 22px;
+        font-weight: 500;
+      "
+    >
+      <div style="display: flex; flex-direction: column; font-size: 22px;margin-bottom:20px;">
+        <div style="color: #7a7d89">Admin</div>
+        <div>${ownerAddress.substring(0, 10)}...</div>
+      </div>
 
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; font-size: 22px">
-      <div>Status</div>
-      <div style="color : green;">
-        Active
+      <div style="display: flex; flex-direction: column; font-size: 22px">
+        <div style="color: #7a7d89">Members</div>
+        <div>${membersCount}</div>
       </div>
     </div>
   </div>
 </div>
+
 `;
 
-module.exports = { DEFAULT, TEST };
+module.exports = { DEFAULT };
