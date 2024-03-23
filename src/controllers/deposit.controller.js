@@ -25,7 +25,6 @@ const validateDepositInput = catchAsync(async (req, res) => {
 });
 
 const aproveTransaction = catchAsync(async (req, res) => {
-  console.log('Alllllll');
   const data = await depositService.aproveTransaction(req.body, req.query.networkId, req.query.depositAmt);
   res.status(httpStatus.OK).send(data);
 });
