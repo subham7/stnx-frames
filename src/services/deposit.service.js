@@ -5,6 +5,8 @@ const fs = require('fs');
 const { join } = require('path');
 const { isNative } = require('../utils/utils');
 const { getFrameMetaHTML } = require('../frames/getFrameMetaHTML');
+const BigNumber = require('bignumber.js');
+const { min } = require('moment/moment');
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf');
 let fontData = fs.readFileSync(fontPath);
@@ -22,6 +24,11 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
 
   let native = isNative(stationDetail.depositTokenAddress, networkId);
   let decimals = native ? 18 : 6;
+  let minDepositAmount = new BigNumber(stationDetail.minDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
+  let maxDepositAmount = new BigNumber(stationDetail.maxDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
+  let totalAmountRaised = new BigNumber(stationDetail.totalAmountRaised)
+    .dividedBy(new BigNumber(10).pow(decimals))
+    .toFixed();
 
   const { html } = await import('satori-html');
   const template = html`<div
@@ -60,11 +67,11 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
       font-size:22px;
       "
     >
-      <div>Min deposit : ${stationDetail.minDepositAmount / 10 ** decimals} USDC</div>
+      <div>Min deposit : ${minDepositAmount} USDC</div>
 
-      <div>Max deposit : ${stationDetail.maxDepositAmount / 10 ** decimals} USDC</div>
+      <div>Max deposit : ${maxDepositAmount} USDC</div>
 
-      <div>Total raised : ${stationDetail.totalAmountRaised / 10 ** decimals} USDC</div>
+      <div>Total raised : ${totalAmountRaised} USDC</div>
     </div>
   </div> `;
 
@@ -119,12 +126,14 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
   let native = isNative(stationDetail.depositTokenAddress, networkId);
   let decimals = native ? 18 : 6;
 
-  stationDetail.minDepositAmount = stationDetail.minDepositAmount / 10 ** decimals;
-  stationDetail.maxDepositAmount = stationDetail.maxDepositAmount / 10 ** decimals;
-  stationDetail.raiseAmount = stationDetail.raiseAmount / 10 ** decimals;
-  stationDetail.totalAmountRaised = stationDetail.totalAmountRaised / 10 ** decimals;
+  let minDepositAmount = new BigNumber(stationDetail.minDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
+  let maxDepositAmount = new BigNumber(stationDetail.maxDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
+  let raiseAmount = new BigNumber(stationDetail.raiseAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
+  let totalAmountRaised = new BigNumber(stationDetail.totalAmountRaised)
+    .dividedBy(new BigNumber(10).pow(decimals))
+    .toFixed();
 
-  if (userDepositAmt < stationDetail.minDepositAmount) {
+  if (userDepositAmt < minDepositAmount) {
     // amt less than min deposit
     return getFrameMetaHTML({
       title: 'StationX Deposit',
@@ -139,7 +148,7 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
       input: 'Enter Deposit Amount',
     });
   }
-  if (userDepositAmt > stationDetail.maxDepositAmount) {
+  if (userDepositAmt > maxDepositAmount) {
     // amt more than max deposit
     return getFrameMetaHTML({
       title: 'StationX Deposit',
@@ -154,7 +163,7 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
       input: 'Enter Deposit Amount',
     });
   }
-  if (userDepositAmt + stationDetail.totalAmountRaised > stationDetail.raiseAmount) {
+  if (userDepositAmt + totalAmountRaised > raiseAmount) {
     // total raise amount limit reached
     return getFrameMetaHTML({
       title: 'StationX Deposit',
