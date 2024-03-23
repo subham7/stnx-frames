@@ -5,32 +5,38 @@ const BigNumber = require('bignumber.js');
 const config = require('../config/config');
 const { getPublicClient } = require('../config/viem');
 const { erc20, factory } = require('../config/abis');
+const { getStationDetails } = require('../subgraph');
 
 const getCallData = async ({ networkId, abi, functionName, functionArgs, contract, value }) => {
-  const encodedData = encodeFunctionData({
-    abi,
-    functionName,
-    args: functionArgs,
-  });
-
-  return {
-    chainId: `eip155:${config.networks[networkId].network}`,
-    method: 'eth_sendTransaction',
-    params: {
+  try {
+    const encodedData = encodeFunctionData({
       abi,
-      to: contract,
-      data: encodedData,
-      value,
-    },
-  };
+      functionName,
+      args: functionArgs,
+    });
+
+    return {
+      chainId: `eip155:${config.networks[networkId].network}`,
+      method: 'eth_sendTransaction',
+      params: {
+        abi,
+        to: contract,
+        data: encodedData,
+        value,
+      },
+    };
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-const approveToken = async (data, networkId) => {
+const approveToken = async (data, depositAmt, networkId) => {
+  const tokenValue = new BigNumber(depositAmt).times(new BigNumber(10).pow(6));
   const callData = await getCallData({
     networkId,
     abi: erc20,
     functionName: 'approve',
-    functionArgs: [data.untrustedData.address, '100000'], // Value needs to be passed
+    functionArgs: [data.untrustedData.address, tokenValue],
     contract: config.networks[networkId].usdcAddress,
     value: '0',
   });
@@ -38,12 +44,18 @@ const approveToken = async (data, networkId) => {
   return callData;
 };
 
-const erc20Deposit = async (data, networkId) => {
+const erc20Deposit = async (data, daoAddress, depositAmt, networkId) => {
+  const res = await getStationDetails({ daoAddress }, networkId);
+  const station = res?.data?.data?.stations[0];
+  const pricePerToken = new BigNumber(station.pricePerToken);
+  const tokenValue = new BigNumber(depositAmt).times(new BigNumber(10).pow(6));
+  const numOfTokensToBuy = tokenValue.div(pricePerToken).times(new BigNumber(10).pow(18));
+
   const callData = await getCallData({
     networkId,
     abi: factory,
     functionName: 'buyGovernanceTokenERC20DAO',
-    functionArgs: ['0x54d8633f41973C11c73f14dB2bA33791F5225e2e', '1000000000000000000', []],
+    functionArgs: [daoAddress, numOfTokensToBuy, []],
     contract: config.networks[networkId].factoryAddress,
     value: '0',
   });
