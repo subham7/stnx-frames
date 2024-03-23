@@ -1,6 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
+const { base } = require('viem/chains');
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -21,21 +22,18 @@ if (error) {
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
-  subgraph: {
-    stnxEthereum: envVars.STNX_ETHEREUM_SUBGRAPH,
-    stnxScroll: envVars.STNX_SCROLL_SUBGRAPH,
-    stnxGoerli: envVars.STNX_GOERLI_SUBGRAPH,
-    stnxPolygon: envVars.STNX_POLYGON_MAINNET_SUBGRAPH,
-    stnxLinea: envVars.STNX_LINEA_SUBGRAPH,
-    stnxBase: envVars.STNX_BASE_SUBGRAPH,
-    claimPolygon: envVars.STNX_POLYGON_CLAIM_SUBGRAPH,
+  networks: {
+    '0x2105': {
+      network: 8453,
+      name: 'base',
+      hex: '0x2105',
+      networkIdentifier: 'base-mainnet',
+      rpc: envVars.BASE_RPC_URL,
+      graph: envVars.STNX_BASE_SUBGRAPH,
+      viemConfig: base,
+      factoryAddress: envVars.BASE_FACTORY_CONTRACT,
+      usdcAddress: envVars.BASE_USDC_CONTRACT,
+      nativeToken: envVars.BASE_NATIVE,
+    },
   },
-  // mongoose: {
-  //   url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
-  //   options: {
-  //     useCreateIndex: true,
-  //     useNewUrlParser: true,
-  //     useUnifiedTopology: true,
-  //   },
-  // },
 };
