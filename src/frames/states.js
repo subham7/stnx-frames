@@ -84,11 +84,10 @@ const DEPOSIT_TXN_FRAME = (daoAddress, networkId, depositAmt) =>
     ],
   });
 
-const SUCCESS = () =>
-  getFrameMetaHTML({
-    title: 'StationX Deposit',
-    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/success.png',
-  });
+const SUCCESS = getFrameMetaHTML({
+  title: 'StationX Deposit',
+  imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/success.png',
+});
 
 module.exports = {
   DEFAULT,
