@@ -108,4 +108,96 @@ const getDepositFrame = async (daoAddress, networkId) => {
   return frameHTML;
 };
 
-module.exports = { getDepositFrameImage, getDepositFrame };
+const validateDepositInput = async (daoAddress, networkId, data) => {
+  let userDepositAmt = parseInt(data.untrustedData.inputText); //  validate this
+  console.log('userDepositAmt---->', userDepositAmt);
+
+  const subgraph = new Subgraph(networkId);
+  const res = await subgraph.getStationDetails(daoAddress);
+  const stationDetail = res?.data?.data?.stations[0];
+
+  let native = isNative(stationDetail.depositTokenAddress, networkId);
+  let decimals = native ? 18 : 6;
+
+  stationDetail.minDepositAmount = stationDetail.minDepositAmount / 10 ** decimals;
+  stationDetail.maxDepositAmount = stationDetail.maxDepositAmount / 10 ** decimals;
+  stationDetail.raiseAmount = stationDetail.raiseAmount / 10 ** decimals;
+  stationDetail.totalAmountRaised = stationDetail.totalAmountRaised / 10 ** decimals;
+
+  if (userDepositAmt < stationDetail.minDepositAmount) {
+    // amt less than min deposit
+    return getFrameMetaHTML({
+      title: 'StationX Deposit',
+      imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
+      buttons: [
+        {
+          label: 'Retry',
+          action: 'post',
+          target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
+        },
+      ],
+      input: 'Enter Deposit Amount',
+    });
+  }
+  if (userDepositAmt > stationDetail.maxDepositAmount) {
+    // amt more than max deposit
+    return getFrameMetaHTML({
+      title: 'StationX Deposit',
+      imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
+      buttons: [
+        {
+          label: 'Retry',
+          action: 'post',
+          target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
+        },
+      ],
+      input: 'Enter Deposit Amount',
+    });
+  }
+  if (userDepositAmt + stationDetail.totalAmountRaised > stationDetail.raiseAmount) {
+    // total raise amount limit reached
+    return getFrameMetaHTML({
+      title: 'StationX Deposit',
+      imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
+      buttons: [
+        {
+          label: 'Retry',
+          action: 'post',
+          target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
+        },
+      ],
+      input: 'Enter Deposit Amount',
+    });
+  }
+
+  // if all conditions meet , return frameHTML with 'tx' action btn
+
+  return getFrameMetaHTML({
+    title: 'StationX Deposit',
+    imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`,
+    buttons: [
+      {
+        label: `Deposit ${userDepositAmt} $`,
+        action: 'tx',
+        target: `${process.env.SERVER_URL}/v1/deposit/txn?daoAddress=${daoAddress}&networkId=${networkId}&depositAmt=${userDepositAmt}`,
+      },
+    ],
+  });
+};
+
+const depositTransaction = async (data) => {
+  console.log('Txn request received !');
+  console.log(data);
+  return {
+    chainId: 'eip155:8453',
+    method: 'eth_sendTransaction',
+    params: {
+      abi: [], // JSON ABI of the function selector and any errors
+      to: '0x00000000fcCe7f938e7aE6D3c335bD6a1a7c593D',
+      data: '0x783a112b0000000000000000000000000000000000000000000000000000000000000e250000000000000000000000000000000000000000000000000000000000000001',
+      value: '984316556204476',
+    },
+  };
+};
+
+module.exports = { getDepositFrameImage, getDepositFrame, validateDepositInput, depositTransaction };

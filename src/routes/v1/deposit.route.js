@@ -7,4 +7,8 @@ router.get('/:daoAddress/:networkId', depositController.getDepositFrame);
 
 router.get('/image/:daoAddress/:networkId', depositController.getDepositFrameImage);
 
+router.post('/validate', depositController.validateDepositInput);
+
+router.post('/txn', depositController.depositTransaction);
+
 module.exports = router;
