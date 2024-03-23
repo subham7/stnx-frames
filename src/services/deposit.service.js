@@ -1,4 +1,4 @@
-const Subgraph = require('../subgraph');
+const { getStationDetails } = require('../subgraph');
 const satori = require('satori').default;
 const { Resvg } = require('@resvg/resvg-js');
 const fs = require('fs');
@@ -8,13 +8,13 @@ const { getFrameMetaHTML } = require('../frames/getFrameMetaHTML');
 const BigNumber = require('bignumber.js');
 const FRAME_STATE = require('../frames/states');
 const TEMPLATES = require('../frames/templates');
+const { approveToken } = require('./transaction.service');
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf');
 let fontData = fs.readFileSync(fontPath);
 
 const getDepositFrameImage = async (daoAddress, networkId) => {
-  const subgraph = new Subgraph(networkId);
-  const res = await subgraph.getStationDetails(daoAddress);
+  const res = await getStationDetails({ daoAddress }, networkId);
   const stationDetail = res?.data?.data?.stations[0];
 
   let native = isNative(stationDetail.depositTokenAddress, networkId);
@@ -56,10 +56,9 @@ const getDepositFrame = async (daoAddress, networkId) => {
 };
 
 const validateDepositInput = async (daoAddress, networkId, data) => {
-  let userDepositAmt = parseInt(data.untrustedData.inputText); //  validate this
+  let userDepositAmt = parseFloat(data.untrustedData.inputText); //  validate this
 
-  const subgraph = new Subgraph(networkId);
-  const res = await subgraph.getStationDetails(daoAddress);
+  const res = await getStationDetails({ daoAddress }, networkId);
   const stationDetail = res?.data?.data?.stations[0];
 
   let native = isNative(stationDetail.depositTokenAddress, networkId);
@@ -96,19 +95,8 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
   });
 };
 
-const depositTransaction = async (data) => {
-  console.log('Txn request received !');
-  console.log(data);
-  return {
-    chainId: 'eip155:8453',
-    method: 'eth_sendTransaction',
-    params: {
-      abi: [], // JSON ABI of the function selector and any errors
-      to: '0x00000000fcCe7f938e7aE6D3c335bD6a1a7c593D',
-      data: '0x783a112b0000000000000000000000000000000000000000000000000000000000000e250000000000000000000000000000000000000000000000000000000000000001',
-      value: '984316556204476',
-    },
-  };
+const depositTransaction = async (data, networkId, depositAmt) => {
+  return approveToken(data, networkId, depositAmt);
 };
 
 module.exports = { getDepositFrameImage, getDepositFrame, validateDepositInput, depositTransaction };
