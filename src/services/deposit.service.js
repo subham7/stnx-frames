@@ -8,7 +8,7 @@ const { getFrameMetaHTML } = require('../frames/getFrameMetaHTML');
 const BigNumber = require('bignumber.js');
 const FRAME_STATE = require('../frames/states');
 const TEMPLATES = require('../frames/templates');
-const { approveToken } = require('./transaction.service');
+const { approveToken, erc20Deposit } = require('./transaction.service');
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf');
 let fontData = fs.readFileSync(fontPath);
@@ -96,7 +96,7 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
 };
 
 const depositTransaction = async (data, networkId, depositAmt) => {
-  return approveToken(data, networkId, depositAmt);
+  return erc20Deposit(data, networkId);
 };
 
 module.exports = { getDepositFrameImage, getDepositFrame, validateDepositInput, depositTransaction };
