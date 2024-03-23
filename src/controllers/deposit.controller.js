@@ -17,7 +17,21 @@ const getDepositFrame = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(FrameHTML);
 });
 
+const validateDepositInput = catchAsync(async (req, res) => {
+  const { daoAddress, networkId } = req.query;
+  const FrameHTML = await depositService.validateDepositInput(daoAddress, networkId, req.body);
+  res.setHeader('Content-Type', 'text/html');
+  res.status(httpStatus.OK).send(FrameHTML);
+});
+
+const depositTransaction = catchAsync(async (req, res) => {
+  const data = await depositService.depositTransaction(req.body);
+  res.status(httpStatus.OK).send(data);
+});
+
 module.exports = {
   getDepositFrame,
   getDepositFrameImage,
+  validateDepositInput,
+  depositTransaction,
 };
