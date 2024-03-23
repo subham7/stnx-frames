@@ -6,17 +6,12 @@ const { join } = require('path');
 const { isNative } = require('../utils/utils');
 const { getFrameMetaHTML } = require('../frames/getFrameMetaHTML');
 const BigNumber = require('bignumber.js');
-const { min } = require('moment/moment');
+const FRAME_STATE = require('../frames/states');
+const TEMPLATES = require('../frames/templates');
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf');
 let fontData = fs.readFileSync(fontPath);
 
-/*
-   - generate html with club Data
-   - convert html to svg
-   - svg -> png
-   - send image Buffer as response
-   */
 const getDepositFrameImage = async (daoAddress, networkId) => {
   const subgraph = new Subgraph(networkId);
   const res = await subgraph.getStationDetails(daoAddress);
@@ -24,56 +19,15 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
 
   let native = isNative(stationDetail.depositTokenAddress, networkId);
   let decimals = native ? 18 : 6;
-  let minDepositAmount = new BigNumber(stationDetail.minDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
-  let maxDepositAmount = new BigNumber(stationDetail.maxDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
+  let stationName = stationDetail.name;
+  let minDepositAmount = new BigNumber(stationDetail.minDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toNumber();
+  let maxDepositAmount = new BigNumber(stationDetail.maxDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toNumber();
   let totalAmountRaised = new BigNumber(stationDetail.totalAmountRaised)
     .dividedBy(new BigNumber(10).pow(decimals))
-    .toFixed();
+    .toNumber();
 
   const { html } = await import('satori-html');
-  const template = html`<div
-    style="
-    display: flex;
-    flex-direction:column;
-    justify-content: center;
-    width: 600px;
-    height: 400px;
-    color: #000;
-  "
-  >
-    <div
-      style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 6px;
-      padding: 12px;
-      border-radius: 4px;
-      background: grey;
-      color: #fff;
-      font-size: 30px;
-      font-weight:350;
-    "
-    >
-      ${stationDetail.name}
-    </div>
-
-    <div
-      style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction:column;
-      font-size:22px;
-      "
-    >
-      <div>Min deposit : ${minDepositAmount} USDC</div>
-
-      <div>Max deposit : ${maxDepositAmount} USDC</div>
-
-      <div>Total raised : ${totalAmountRaised} USDC</div>
-    </div>
-  </div> `;
+  const template = html(TEMPLATES.DEFAULT(stationName, minDepositAmount, maxDepositAmount, totalAmountRaised));
 
   const svg = await satori(template, {
     width: 600,
@@ -98,26 +52,11 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
 };
 
 const getDepositFrame = async (daoAddress, networkId) => {
-  const imageUrl = `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`;
-
-  const frameHTML = getFrameMetaHTML({
-    title: 'StationX Deposit',
-    imageUrl,
-    buttons: [
-      {
-        label: 'Deposit',
-        action: 'post',
-        target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
-      },
-    ],
-    input: 'Enter Deposit Amount',
-  });
-  return frameHTML;
+  return FRAME_STATE.DEFAULT(daoAddress, networkId);
 };
 
 const validateDepositInput = async (daoAddress, networkId, data) => {
   let userDepositAmt = parseInt(data.untrustedData.inputText); //  validate this
-  console.log('userDepositAmt---->', userDepositAmt);
 
   const subgraph = new Subgraph(networkId);
   const res = await subgraph.getStationDetails(daoAddress);
@@ -126,61 +65,24 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
   let native = isNative(stationDetail.depositTokenAddress, networkId);
   let decimals = native ? 18 : 6;
 
-  let minDepositAmount = new BigNumber(stationDetail.minDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
-  let maxDepositAmount = new BigNumber(stationDetail.maxDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
-  let raiseAmount = new BigNumber(stationDetail.raiseAmount).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
+  let minDepositAmount = new BigNumber(stationDetail.minDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toNumber();
+  let maxDepositAmount = new BigNumber(stationDetail.maxDepositAmount).dividedBy(new BigNumber(10).pow(decimals)).toNumber();
+  let raiseAmount = new BigNumber(stationDetail.raiseAmount).dividedBy(new BigNumber(10).pow(decimals)).toNumber();
   let totalAmountRaised = new BigNumber(stationDetail.totalAmountRaised)
     .dividedBy(new BigNumber(10).pow(decimals))
-    .toFixed();
+    .toNumber();
 
   if (userDepositAmt < minDepositAmount) {
-    // amt less than min deposit
-    return getFrameMetaHTML({
-      title: 'StationX Deposit',
-      imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
-      buttons: [
-        {
-          label: 'Retry',
-          action: 'post',
-          target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
-        },
-      ],
-      input: 'Enter Deposit Amount',
-    });
+    return FRAME_STATE.AMT_LESS_THAN_MIN(daoAddress, networkId);
   }
   if (userDepositAmt > maxDepositAmount) {
-    // amt more than max deposit
-    return getFrameMetaHTML({
-      title: 'StationX Deposit',
-      imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
-      buttons: [
-        {
-          label: 'Retry',
-          action: 'post',
-          target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
-        },
-      ],
-      input: 'Enter Deposit Amount',
-    });
+    return FRAME_STATE.AMT_MORE_THAN_MAX(daoAddress, networkId);
   }
   if (userDepositAmt + totalAmountRaised > raiseAmount) {
-    // total raise amount limit reached
-    return getFrameMetaHTML({
-      title: 'StationX Deposit',
-      imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
-      buttons: [
-        {
-          label: 'Retry',
-          action: 'post',
-          target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
-        },
-      ],
-      input: 'Enter Deposit Amount',
-    });
+    return FRAME_STATE.TOTAL_RAISE_LIMIT_EXCEEDED(daoAddress, networkId);
   }
 
   // if all conditions meet , return frameHTML with 'tx' action btn
-
   return getFrameMetaHTML({
     title: 'StationX Deposit',
     imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`,
