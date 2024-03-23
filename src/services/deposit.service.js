@@ -4,6 +4,7 @@ const { Resvg } = require('@resvg/resvg-js');
 const fs = require('fs');
 const { join } = require('path');
 const { isNative } = require('../utils/utils');
+const { getFrameMetaHTML } = require('../frames/getFrameMetaHTML');
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf');
 let fontData = fs.readFileSync(fontPath);
@@ -89,4 +90,22 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
   return pngBuffer;
 };
 
-module.exports = { getDepositFrameImage };
+const getDepositFrame = async (daoAddress, networkId) => {
+  const imageUrl = `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`;
+
+  const frameHTML = getFrameMetaHTML({
+    title: 'StationX Deposit',
+    imageUrl,
+    buttons: [
+      {
+        label: 'Deposit',
+        action: 'post',
+        target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
+      },
+    ],
+    input: 'Enter Deposit Amount',
+  });
+  return frameHTML;
+};
+
+module.exports = { getDepositFrameImage, getDepositFrame };

@@ -10,6 +10,14 @@ const getDepositFrameImage = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(imageBuffer);
 });
 
+const getDepositFrame = catchAsync(async (req, res) => {
+  const { daoAddress, networkId } = req.params;
+  const FrameHTML = await depositService.getDepositFrame(daoAddress, networkId);
+  res.setHeader('Content-Type', 'text/html');
+  res.status(httpStatus.OK).send(FrameHTML);
+});
+
 module.exports = {
+  getDepositFrame,
   getDepositFrameImage,
 };
