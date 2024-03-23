@@ -6,7 +6,9 @@ const getFrameMetaHTML = ({ title, imageUrl, postUrl, buttons = [], input }) => 
       .map(
         (button, i) => `<meta name="fc:frame:button:${i + 1}" content="${button.label}">
                       <meta property="fc:frame:button:${i + 1}:action" content="${button.action}" />
-                      <meta property="fc:frame:button:${i + 1}:target" content="${button.target}"/>`
+                      <meta property="fc:frame:button:${i + 1}:target" content="${button.target}"/>
+                      ${button.post_url && `<meta property="fc:frame:button:${i + 1}:post_url" content="${button.post_url}"`}
+                      `
       )
       .join('');
 

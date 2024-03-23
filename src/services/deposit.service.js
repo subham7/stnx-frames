@@ -4,7 +4,6 @@ const { Resvg } = require('@resvg/resvg-js');
 const fs = require('fs');
 const { join } = require('path');
 const { isNative } = require('../utils/utils');
-const { getFrameMetaHTML } = require('../frames/getFrameMetaHTML');
 const BigNumber = require('bignumber.js');
 const FRAME_STATE = require('../frames/states');
 const TEMPLATES = require('../frames/templates');
@@ -82,21 +81,31 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
   }
 
   // if all conditions meet , return frameHTML with 'tx' action btn
-  return getFrameMetaHTML({
-    title: 'StationX Deposit',
-    imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`,
-    buttons: [
-      {
-        label: `Deposit ${userDepositAmt} $`,
-        action: 'tx',
-        target: `${process.env.SERVER_URL}/v1/deposit/txn?daoAddress=${daoAddress}&networkId=${networkId}&depositAmt=${userDepositAmt}`,
-      },
-    ],
-  });
+  return FRAME_STATE.APPROVE_TXN_FRAME(daoAddress, networkId, userDepositAmt);
+};
+
+const aproveTransaction = async (data, networkId, depositAmt) => {
+  return approveToken(data, networkId);
+};
+
+const approvedTransactionFrame = async (daoAddress, networkId, depositAmt) => {
+  return FRAME_STATE.DEPOSIT_TXN_FRAME(daoAddress, networkId, depositAmt);
 };
 
 const depositTransaction = async (data, networkId, depositAmt) => {
   return erc20Deposit(data, networkId);
 };
 
-module.exports = { getDepositFrameImage, getDepositFrame, validateDepositInput, depositTransaction };
+const successTransactionFrame = async () => {
+  return FRAME_STATE.SUCCESS;
+};
+
+module.exports = {
+  getDepositFrameImage,
+  getDepositFrame,
+  validateDepositInput,
+  depositTransaction,
+  aproveTransaction,
+  approvedTransactionFrame,
+  successTransactionFrame,
+};

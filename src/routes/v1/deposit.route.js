@@ -9,6 +9,12 @@ router.get('/image/:daoAddress/:networkId', depositController.getDepositFrameIma
 
 router.post('/validate', depositController.validateDepositInput);
 
+router.post('/approve', depositController.aproveTransaction);
+
+router.post('/txn-approved', depositController.approvedTransactionFrame);
+
 router.post('/txn', depositController.depositTransaction);
+
+router.post('/txn-success', depositController.successTransactionFrame);
 
 module.exports = router;

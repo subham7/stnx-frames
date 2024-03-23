@@ -56,16 +56,46 @@ const TOTAL_RAISE_LIMIT_EXCEEDED = (daoAddress, networkId) =>
     input: 'Enter Deposit Amount',
   });
 
-const SUCCESS = () => {};
+const APPROVE_TXN_FRAME = (daoAddress, networkId, depositAmt) =>
+  getFrameMetaHTML({
+    title: 'StationX Deposit',
+    imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`,
+    buttons: [
+      {
+        label: `Approve ${depositAmt} $`,
+        action: 'tx',
+        target: `${process.env.SERVER_URL}/v1/deposit/approve?daoAddress=${daoAddress}&networkId=${networkId}&depositAmt=${depositAmt}`,
+        post_url: `${process.env.SERVER_URL}/v1/deposit/txn-approved?daoAddress=${daoAddress}&networkId=${networkId}&depositAmt=${depositAmt}`,
+      },
+    ],
+  });
 
-const TXN_APPROVE = (daoAddress, networkId) => {};
-const TXN_DEPOSIT = (daoAddress, networkId) => {};
+const DEPOSIT_TXN_FRAME = (daoAddress, networkId, depositAmt) =>
+  getFrameMetaHTML({
+    title: 'StationX Deposit',
+    imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`,
+    buttons: [
+      {
+        label: `Deposit ${depositAmt} $`,
+        action: 'tx',
+        target: `${process.env.SERVER_URL}/v1/deposit/txn?daoAddress=${daoAddress}&networkId=${networkId}&depositAmt=${depositAmt}`,
+        post_url: `${process.env.SERVER_URL}/v1/deposit/txn-success?daoAddress=${daoAddress}&networkId=${networkId}&depositAmt=${depositAmt}`,
+      },
+    ],
+  });
+
+const SUCCESS = () =>
+  getFrameMetaHTML({
+    title: 'StationX Deposit',
+    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/success.png',
+  });
 
 module.exports = {
   DEFAULT,
   AMT_LESS_THAN_MIN,
   AMT_MORE_THAN_MAX,
   TOTAL_RAISE_LIMIT_EXCEEDED,
-  TXN_APPROVE,
+  APPROVE_TXN_FRAME,
+  DEPOSIT_TXN_FRAME,
   SUCCESS,
 };

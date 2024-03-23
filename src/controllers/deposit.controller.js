@@ -24,9 +24,28 @@ const validateDepositInput = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(FrameHTML);
 });
 
+const aproveTransaction = catchAsync(async (req, res) => {
+  const data = await depositService.aproveTransaction(req.body, req.query.networkId, req.query.depositAmt);
+  res.status(httpStatus.OK).send(data);
+});
+
+const approvedTransactionFrame = catchAsync(async (req, res) => {
+  const { daoAddress, networkId, depositAmt } = req.query;
+  const FrameHTML = await depositService.approvedTransactionFrame(daoAddress, networkId, depositAmt);
+  res.setHeader('Content-Type', 'text/html');
+  res.status(httpStatus.OK).send(FrameHTML);
+});
+
 const depositTransaction = catchAsync(async (req, res) => {
   const data = await depositService.depositTransaction(req.body, req.query.networkId, req.query.depositAmt);
   res.status(httpStatus.OK).send(data);
+});
+
+const successTransactionFrame = catchAsync(async (req, res) => {
+  const { daoAddress, networkId, depositAmt } = req.query;
+  const FrameHTML = await depositService.successTransactionFrame(daoAddress, networkId, depositAmt);
+  res.setHeader('Content-Type', 'text/html');
+  res.status(httpStatus.OK).send(FrameHTML);
 });
 
 module.exports = {
@@ -34,4 +53,7 @@ module.exports = {
   getDepositFrameImage,
   validateDepositInput,
   depositTransaction,
+  aproveTransaction,
+  approvedTransactionFrame,
+  successTransactionFrame,
 };
