@@ -17,7 +17,7 @@ const DEFAULT = (daoAddress, networkId) =>
 const AMT_LESS_THAN_MIN = (daoAddress, networkId) =>
   getFrameMetaHTML({
     title: 'StationX Deposit',
-    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
+    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/hackathon-frames/wrong_amt.png',
     buttons: [
       {
         label: 'Retry',
@@ -31,7 +31,7 @@ const AMT_LESS_THAN_MIN = (daoAddress, networkId) =>
 const AMT_MORE_THAN_MAX = (daoAddress, networkId) =>
   getFrameMetaHTML({
     title: 'StationX Deposit',
-    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
+    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/hackathon-frames/wrong_amt.png',
     buttons: [
       {
         label: 'Retry',
@@ -45,7 +45,7 @@ const AMT_MORE_THAN_MAX = (daoAddress, networkId) =>
 const TOTAL_RAISE_LIMIT_EXCEEDED = (daoAddress, networkId) =>
   getFrameMetaHTML({
     title: 'StationX Deposit',
-    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/try_again.png',
+    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/hackathon-frames/almost_full.png',
     buttons: [
       {
         label: 'Retry',
@@ -86,7 +86,7 @@ const DEPOSIT_TXN_FRAME = (daoAddress, networkId, depositAmt) =>
 
 const SUCCESS = getFrameMetaHTML({
   title: 'StationX Deposit',
-  imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames/v2/success.png',
+  imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/hackathon-frames/success.png',
 });
 
 module.exports = {
