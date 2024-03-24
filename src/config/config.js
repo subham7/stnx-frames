@@ -22,6 +22,7 @@ if (error) {
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  serverUrl: envVars.SERVER_URL,
   networks: {
     '0x2105': {
       network: 8453,
