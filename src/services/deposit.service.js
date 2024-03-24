@@ -1,16 +1,33 @@
 const { getStationDetails } = require('../subgraph');
-const satori = require('satori').default;
-const { Resvg } = require('@resvg/resvg-js');
-const fs = require('fs');
 const { join } = require('path');
 const { isNative } = require('../utils/utils');
-const BigNumber = require('bignumber.js');
 const FRAME_STATE = require('../frames/states');
 const TEMPLATES = require('../frames/templates');
 const { approveToken, erc20Deposit } = require('./transaction.service');
+const config = require('../config/config');
+
+const fs = require('fs');
+const satori = require('satori').default;
+const { Resvg } = require('@resvg/resvg-js');
+const BigNumber = require('bignumber.js');
+const { readContractCall } = require('../config/viem');
+const { erc20 } = require('../config/abis');
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf');
 let fontData = fs.readFileSync(fontPath);
+
+const checkAllowance = async (networkId, owner, spender) => {
+  const allowance = await readContractCall({
+    networkId,
+    address: config.networks[networkId].usdcAddress,
+    abi: erc20,
+    functionName: 'allowance',
+    args: [owner, spender],
+    account: owner,
+  });
+
+  return allowance;
+};
 
 const getDepositFrameImage = async (daoAddress, networkId, depositAmt, ctx) => {
   const res = await getStationDetails({ daoAddress }, networkId);
@@ -102,7 +119,12 @@ const validateDepositInput = async (daoAddress, networkId, data) => {
 };
 
 const aproveTransaction = async (data, networkId, depositAmt) => {
-  return approveToken(data, depositAmt, networkId);
+  await checkAllowance(
+    networkId,
+    '0x66264a63fce8bacf52e36a4f005179d71514ad8e',
+    '0xeb6FE72d1Df22D9936D4FA317D7948E643aF92CB'
+  );
+  return approveToken(depositAmt, networkId);
 };
 
 const approvedTransactionFrame = async (daoAddress, networkId, depositAmt) => {
@@ -110,7 +132,7 @@ const approvedTransactionFrame = async (daoAddress, networkId, depositAmt) => {
 };
 
 const depositTransaction = async (data, networkId, depositAmt, daoAddress) => {
-  return erc20Deposit(data, daoAddress, depositAmt, networkId);
+  return erc20Deposit(daoAddress, depositAmt, networkId);
 };
 
 const successTransactionFrame = async () => {
