@@ -12,7 +12,7 @@ const { approveToken, erc20Deposit } = require('./transaction.service');
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf');
 let fontData = fs.readFileSync(fontPath);
 
-const getDepositFrameImage = async (daoAddress, networkId) => {
+const getDepositFrameImage = async (daoAddress, networkId, depositAmt, ctx) => {
   const res = await getStationDetails({ daoAddress }, networkId);
   const stationDetail = res?.data?.data?.stations[0];
 
@@ -29,18 +29,22 @@ const getDepositFrameImage = async (daoAddress, networkId) => {
   let membersCount = stationDetail.membersCount;
 
   const { html } = await import('satori-html');
-  const template = html(
-    TEMPLATES.DEFAULT(
-      stationName,
-      minDepositAmount,
-      maxDepositAmount,
-      totalAmountRaised,
-      raiseAmount,
-      ownerAddress,
-      membersCount
-    )
-  );
-
+  let template;
+  if (ctx == 'deposit') {
+    template = html(TEMPLATES.DEPOSIT(stationName, depositAmt));
+  } else {
+    template = html(
+      TEMPLATES.DEFAULT(
+        stationName,
+        minDepositAmount,
+        maxDepositAmount,
+        totalAmountRaised,
+        raiseAmount,
+        ownerAddress,
+        membersCount
+      )
+    );
+  }
   const svg = await satori(template, {
     width: 600,
     height: 400,

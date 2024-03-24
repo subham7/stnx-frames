@@ -6,7 +6,7 @@ const DEFAULT = (daoAddress, networkId) =>
     imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`,
     buttons: [
       {
-        label: 'Deposit',
+        label: 'Join',
         action: 'post',
         target: `${process.env.SERVER_URL}/v1/deposit/validate?daoAddress=${daoAddress}&networkId=${networkId}`,
       },
@@ -73,7 +73,7 @@ const APPROVE_TXN_FRAME = (daoAddress, networkId, depositAmt) =>
 const DEPOSIT_TXN_FRAME = (daoAddress, networkId, depositAmt) =>
   getFrameMetaHTML({
     title: 'StationX Deposit',
-    imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}`,
+    imageUrl: `${process.env.SERVER_URL}/v1/deposit/image/${daoAddress}/${networkId}?depositAmt=${depositAmt}&ctx=deposit`,
     buttons: [
       {
         label: `Deposit ${depositAmt} $`,

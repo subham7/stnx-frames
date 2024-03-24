@@ -4,7 +4,12 @@ const { depositService } = require('../services');
 
 const getDepositFrameImage = catchAsync(async (req, res) => {
   const { daoAddress, networkId } = req.params;
-  const imageBuffer = await depositService.getDepositFrameImage(daoAddress, networkId);
+  const imageBuffer = await depositService.getDepositFrameImage(
+    daoAddress,
+    networkId,
+    req.query?.depositAmt,
+    req.query?.ctx
+  );
   res.setHeader('Content-Type', 'image/png');
   res.setHeader('Cache-Control', 'max-age=10');
   res.status(httpStatus.OK).send(imageBuffer);
