@@ -22,7 +22,7 @@ if (error) {
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
-  serverUrl: 'https://stnx-frames-abde6763c167.herokuapp.com',
+  serverUrl: 'https://stnx-frames-24417d68ca10.herokuapp.com',
   networks: {
     '0x2105': {
       network: 8453,
