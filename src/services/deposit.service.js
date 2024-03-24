@@ -113,8 +113,8 @@ const depositTransaction = async (data, networkId, depositAmt, daoAddress) => {
   return erc20Deposit(data, daoAddress, depositAmt, networkId);
 };
 
-const successTransactionFrame = async () => {
-  return FRAME_STATE.SUCCESS;
+const successTransactionFrame = async (daoAddress, networkId) => {
+  return FRAME_STATE.SUCCESS(daoAddress, networkId);
 };
 
 module.exports = {

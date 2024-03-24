@@ -4,6 +4,7 @@ const depositController = require('../../controllers/deposit.controller');
 const router = express.Router();
 
 router.get('/:daoAddress/:networkId', depositController.getDepositFrame);
+router.post('/:daoAddress/:networkId', depositController.getDepositFrame);
 
 router.get('/image/:daoAddress/:networkId', depositController.getDepositFrameImage);
 

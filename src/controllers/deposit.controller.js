@@ -52,8 +52,8 @@ const depositTransaction = catchAsync(async (req, res) => {
 });
 
 const successTransactionFrame = catchAsync(async (req, res) => {
-  const { daoAddress, networkId, depositAmt } = req.query;
-  const FrameHTML = await depositService.successTransactionFrame(daoAddress, networkId, depositAmt);
+  const { daoAddress, networkId } = req.query;
+  const FrameHTML = await depositService.successTransactionFrame(daoAddress, networkId);
   res.setHeader('Content-Type', 'text/html');
   res.status(httpStatus.OK).send(FrameHTML);
 });

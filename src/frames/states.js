@@ -84,10 +84,23 @@ const DEPOSIT_TXN_FRAME = (daoAddress, networkId, depositAmt) =>
     ],
   });
 
-const SUCCESS = getFrameMetaHTML({
-  title: 'StationX Deposit',
-  imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/hackathon-frames/success.png',
-});
+const SUCCESS = (daoAddress, networkId) =>
+  getFrameMetaHTML({
+    title: 'StationX Deposit',
+    imageUrl: 'https://clubprofilepics.s3.ap-south-1.amazonaws.com/hackathon-frames/success.png',
+    buttons: [
+      {
+        label: `Deposit Again`,
+        action: 'post',
+        target: `${process.env.SERVER_URL}/v1/deposit/${daoAddress}/${networkId}`,
+      },
+      {
+        label: `Goto Dashboard`,
+        action: 'link',
+        target: `https://stationx-fe-git-feat-stnx-base-station-fe.vercel.app/dashboard/${daoAddress}/0x2105`,
+      },
+    ],
+  });
 
 module.exports = {
   DEFAULT,
